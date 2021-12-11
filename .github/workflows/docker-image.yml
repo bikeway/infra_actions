@@ -6,34 +6,34 @@ on: [push]
 jobs:
   tests:
     steps:
-    # Запуск actions checkout — готового скрипта 
-    # для клонирования репозитория
+    # Р—Р°РїСѓСЃРє actions checkout вЂ” РіРѕС‚РѕРІРѕРіРѕ СЃРєСЂРёРїС‚Р° 
+    # РґР»СЏ РєР»РѕРЅРёСЂРѕРІР°РЅРёСЏ СЂРµРїРѕР·РёС‚РѕСЂРёСЏ
     - uses: actions/checkout@v2
     - name: Set up Python
-      # Запуск actions setup-python — готового скрипта 
-      # для развёртывания окружения Python
+      # Р—Р°РїСѓСЃРє actions setup-python вЂ” РіРѕС‚РѕРІРѕРіРѕ СЃРєСЂРёРїС‚Р° 
+      # РґР»СЏ СЂР°Р·РІС‘СЂС‚С‹РІР°РЅРёСЏ РѕРєСЂСѓР¶РµРЅРёСЏ Python
       uses: actions/setup-python@v2
       with:
-        # Выбор версии Python
+        # Р’С‹Р±РѕСЂ РІРµСЂСЃРёРё Python
         python-version: 3.7
 
     - name: Install dependencies
       run: | 
-        # обновление pip
+        # РѕР±РЅРѕРІР»РµРЅРёРµ pip
         python -m pip install --upgrade pip 
-        # установка flake8 и его плагинов
+        # СѓСЃС‚Р°РЅРѕРІРєР° flake8 Рё РµРіРѕ РїР»Р°РіРёРЅРѕРІ
         pip install flake8 pep8-naming flake8-broken-line flake8-return flake8-isort
-        # установка зависимостей
+        # СѓСЃС‚Р°РЅРѕРІРєР° Р·Р°РІРёСЃРёРјРѕСЃС‚РµР№
         pip install -r requirements.txt 
 
     - name: Test with flake8 and django tests
       run: |
-        # запуск проверки проекта по flake8
+        # Р·Р°РїСѓСЃРє РїСЂРѕРІРµСЂРєРё РїСЂРѕРµРєС‚Р° РїРѕ flake8
         python -m flake8
-        # перейти в папку, содержащую manage.py — 
-        #<корневая_папка_infra_actions>/<папка_проекта>/manage.py
+        # РїРµСЂРµР№С‚Рё РІ РїР°РїРєСѓ, СЃРѕРґРµСЂР¶Р°С‰СѓСЋ manage.py вЂ” 
+        #<РєРѕСЂРЅРµРІР°СЏ_РїР°РїРєР°_infra_actions>/<РїР°РїРєР°_РїСЂРѕРµРєС‚Р°>/manage.py
         cd infra_project/
-        # запустить написанные разработчиком тесты
+        # Р·Р°РїСѓСЃС‚РёС‚СЊ РЅР°РїРёСЃР°РЅРЅС‹Рµ СЂР°Р·СЂР°Р±РѕС‚С‡РёРєРѕРј С‚РµСЃС‚С‹
         python manage.py test
 
   build_and_push_to_docker_hub:
@@ -42,19 +42,19 @@ jobs:
     needs: tests
     steps:
       - name: Check out the repo
-        # Проверка доступности репозитория Docker Hub для workflow
+        # РџСЂРѕРІРµСЂРєР° РґРѕСЃС‚СѓРїРЅРѕСЃС‚Рё СЂРµРїРѕР·РёС‚РѕСЂРёСЏ Docker Hub РґР»СЏ workflow
         uses: actions/checkout@v2 
       - name: Set up Docker Buildx
-        # Вызов сборщика контейнеров docker
+        # Р’С‹Р·РѕРІ СЃР±РѕСЂС‰РёРєР° РєРѕРЅС‚РµР№РЅРµСЂРѕРІ docker
         uses: docker/setup-buildx-action@v1 
       - name: Login to Docker 
-        # Запуск скрипта авторизации на Docker Hub
+        # Р—Р°РїСѓСЃРє СЃРєСЂРёРїС‚Р° Р°РІС‚РѕСЂРёР·Р°С†РёРё РЅР° Docker Hub
         uses: docker/login-action@v1 
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Push to Docker Hub
-        # Пуш образа в Docker Hub 
+        # РџСѓС€ РѕР±СЂР°Р·Р° РІ Docker Hub 
         uses: docker/build-push-action@v2 
         with:
           push: true
@@ -70,10 +70,10 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_KEY }}
-        passphrase: ${{ secrets.PASSPHRASE }} # Если ваш ssh-ключ защищён фразой-паролем
+        passphrase: ${{ secrets.PASSPHRASE }} # Р•СЃР»Рё РІР°С€ ssh-РєР»СЋС‡ Р·Р°С‰РёС‰С‘РЅ С„СЂР°Р·РѕР№-РїР°СЂРѕР»РµРј
         script: |
-          # Выполняет pull образа с DockerHub
+          # Р’С‹РїРѕР»РЅСЏРµС‚ pull РѕР±СЂР°Р·Р° СЃ DockerHub
           sudo docker pull ${{ secrets.DOCKER_USERNAME }}/infra_actions
-          #остановка всех контейнеров
+          #РѕСЃС‚Р°РЅРѕРІРєР° РІСЃРµС… РєРѕРЅС‚РµР№РЅРµСЂРѕРІ
           sudo docker stop $(sudo docker ps -a -q)
           sudo docker run --rm -d -p 5000:5000 ${{ secrets.DOCKER_USERNAME }}/infra_actions
